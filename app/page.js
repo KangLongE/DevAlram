@@ -19,7 +19,7 @@ import {
 } from "lucide-react";
 
 const TOKEN_KEY = "dev-alram.jwt";
-const API_BASE = "/backend";
+const API_BASE = "";
 const BACKEND_LABEL = "BACKEND_BASE_URL";
 const FIREBASE_VAPID_KEY = process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY || "";
 
@@ -77,6 +77,12 @@ function normalizeSendAt(value) {
   if (!value) return null;
   const cleanValue = value.split(".")[0];
   return cleanValue.length === 16 ? `${cleanValue}:00` : cleanValue;
+}
+
+function isFutureSendAt(value) {
+  if (!value) return false;
+  const date = new Date(value);
+  return !Number.isNaN(date.getTime()) && date.getTime() > Date.now();
 }
 
 function toInputDateTime(value) {
@@ -137,6 +143,62 @@ function getMissingFirebaseKeys() {
     .map(([key]) => key);
 }
 
+function normalizeTokenValue(value) {
+  return String(value || "").replace(/^Bearer\s+/i, "").trim();
+}
+
+function buildBearerToken(value) {
+  const cleanToken = normalizeTokenValue(value);
+  return cleanToken ? `Bearer ${cleanToken}` : "";
+}
+
+function getAuthTokenFromResponse(data) {
+  return (
+    data?.token ||
+    data?.accessToken ||
+    data?.jwt ||
+    data?.data?.token ||
+    data?.data?.accessToken ||
+    ""
+  );
+}
+
+function getApiErrorMessage(data, status, path) {
+  const fallbackMessage =
+    path === "/api/auth/login" && [401, 403].includes(status)
+      ? "이메일 또는 비밀번호가 다릅니다."
+      : `HTTP ${status}`;
+
+  if (!data) return fallbackMessage;
+  if (typeof data === "string") return data || fallbackMessage;
+
+  const message =
+    data.message ||
+    data.errorMessage ||
+    data.error ||
+    data.detail ||
+    data.reason ||
+    data.data?.message ||
+    data.data?.errorMessage ||
+    data.data?.error;
+
+  if (Array.isArray(message)) return message.join(", ");
+  if (message) return String(message);
+
+  if (Array.isArray(data.errors) && data.errors.length > 0) {
+    return data.errors
+      .map((error) =>
+        typeof error === "string"
+          ? error
+          : error.message || error.defaultMessage || error.reason || "",
+      )
+      .filter(Boolean)
+      .join(", ");
+  }
+
+  return fallbackMessage;
+}
+
 export default function Home() {
   const [token, setToken] = useState("");
   const [authMode, setAuthMode] = useState("login");
@@ -169,8 +231,14 @@ export default function Home() {
         "ngrok-skip-browser-warning": "true",
       };
 
-      if (auth && token) {
-        headers.Authorization = `Bearer ${token}`;
+      if (auth) {
+        const authToken =
+          token ||
+          (typeof window !== "undefined"
+            ? localStorage.getItem(TOKEN_KEY)
+            : "");
+        const bearerToken = buildBearerToken(authToken);
+        if (bearerToken) headers.Authorization = bearerToken;
       }
 
       const response = await fetch(`${API_BASE}${path}`, {
@@ -191,11 +259,13 @@ export default function Home() {
       }
 
       if (!response.ok) {
-        const message =
-          data?.message ||
-          data?.error ||
-          (typeof data === "string" ? data : "") ||
-          `HTTP ${response.status}`;
+        const message = getApiErrorMessage(data, response.status, path);
+        console.error("API request failed", {
+          path,
+          status: response.status,
+          message,
+          response: data,
+        });
         throw new Error(message);
       }
 
@@ -282,6 +352,7 @@ export default function Home() {
       if (authMode === "signup") {
         await request("/api/auth/signup", {
           method: "POST",
+          auth: false,
           body: {
             username: authForm.username.trim(),
             email: authForm.email.trim(),
@@ -295,16 +366,18 @@ export default function Home() {
 
       const data = await request("/api/auth/login", {
         method: "POST",
+        auth: false,
         body: {
           email: authForm.email.trim(),
           password: authForm.password,
         },
       });
 
-      if (!data?.token) throw new Error("로그인 응답에 token이 없습니다.");
+      const nextToken = normalizeTokenValue(getAuthTokenFromResponse(data));
+      if (!nextToken) throw new Error("로그인 응답에 token이 없습니다.");
 
-      localStorage.setItem(TOKEN_KEY, data.token);
-      setToken(data.token);
+      localStorage.setItem(TOKEN_KEY, nextToken);
+      setToken(nextToken);
       setPage(0);
       showToast("success", "로그인 완료");
     } catch (error) {
@@ -319,6 +392,11 @@ export default function Home() {
 
     if (!createPayload.title || !createPayload.body || !createPayload.sendAt) {
       showToast("error", "제목, 내용, 시간을 입력하세요.");
+      return;
+    }
+
+    if (!isFutureSendAt(createPayload.sendAt)) {
+      showToast("error", "전송 시간은 현재보다 미래여야 합니다.");
       return;
     }
 
@@ -357,7 +435,7 @@ export default function Home() {
         method: "POST",
         body: {
           token: deviceToken.trim(),
-          platform,
+          platform: "WEB",
         },
       });
       setDeviceToken("");
@@ -492,6 +570,12 @@ export default function Home() {
         ? editForm.repeatDays.join(",")
         : null;
 
+    const nextSendAt = normalizeSendAt(editForm.sendAt);
+    if (nextSendAt && !isFutureSendAt(nextSendAt)) {
+      showToast("error", "전송 시간은 현재보다 미래여야 합니다.");
+      return;
+    }
+
     setBusyAction("update");
     try {
       await request(`/api/informs/${editing.id}`, {
@@ -499,7 +583,7 @@ export default function Home() {
         body: {
           title: editForm.title.trim() || null,
           body: editForm.body.trim() || null,
-          sendAt: normalizeSendAt(editForm.sendAt),
+          sendAt: nextSendAt,
           repeatType: editForm.repeatType || null,
           repeatDays,
         },
@@ -764,8 +848,6 @@ export default function Home() {
                   onChange={(event) => setPlatform(event.target.value)}
                 >
                   <option value="WEB">WEB</option>
-                  <option value="ANDROID">ANDROID</option>
-                  <option value="IOS">IOS</option>
                 </select>
               </label>
 

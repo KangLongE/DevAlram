@@ -1,10 +1,85 @@
-⨯ Failed to start server
-Error: listen EADDRINUSE: address already in use :::3000
-    at <unknown> (Error: listen EADDRINUSE: address already in use :::3000)
-    at new Promise (<anonymous>) {
-  code: 'EADDRINUSE',
-  errno: -4091,
-  syscall: 'listen',
-  address: '::',
-  port: 3000
+[browser] API request failed { path: [32m'/api/auth/login'[39m, response: [1mnull[22m, status: [33m403[39m } 
+    at Home.useCallback[request] (app/page.js:231:17)
+    at async handleAuthSubmit (app/page.js:334:20)
+  229 |           (typeof data === "string" ? data : "") ||
+  230 |           `HTTP ${response.status}`;
+> 231 |         console.error("API request failed", {
+      |                 ^
+  232 |           path,
+  233 |           status: response.status,
+  234 |           response: data, (app/page.js:231:17)
+[browser] API request failed {
+  message: [32m'HTTP 403'[39m,
+  path: [32m'/api/auth/login'[39m,
+  response: [1mnull[22m,
+  status: [33m403[39m
+} 
+    at Home.useCallback[request] (app/page.js:258:17)
+    at async handleAuthSubmit (app/page.js:362:20)
+  256 |       if (!response.ok) {
+  257 |         const message = getApiErrorMessage(data, response.status);
+> 258 |         console.error("API request failed", {
+      |                 ^
+  259 |           path,
+  260 |           status: response.status,
+  261 |           message, (app/page.js:258:17)
+[browser] API request failed {
+  message: [32m'HTTP 403'[39m,
+  path: [32m'/api/auth/login'[39m,
+  response: [1mnull[22m,
+  status: [33m403[39m
+} 
+    at Home.useCallback[request] (app/page.js:258:17)
+    at async handleAuthSubmit (app/page.js:362:20)
+  256 |       if (!response.ok) {
+  257 |         const message = getApiErrorMessage(data, response.status);
+> 258 |         console.error("API request failed", {
+      |                 ^
+  259 |           path,
+  260 |           status: response.status,
+  261 |           message, (app/page.js:258:17)
+[browser] API request failed {
+  message: [32m'HTTP 403'[39m,
+  path: [32m'/api/auth/login'[39m,
+  response: [1mnull[22m,
+  status: [33m403[39m
+} 
+    at Home.useCallback[request] (app/page.js:258:17)
+    at async handleAuthSubmit (app/page.js:362:20)
+  256 |       if (!response.ok) {
+  257 |         const message = getApiErrorMessage(data, response.status);
+> 258 |         console.error("API request failed", {
+      |                 ^
+  259 |           path,
+  260 |           status: response.status,
+  261 |           message, (app/page.js:258:17)
+[browser] API request failed {
+  message: [32m'HTTP 403'[39m,
+  path: [32m'/api/auth/login'[39m,
+  response: [1mnull[22m,
+  status: [33m403[39m
+} 
+    at Home.useCallback[request] (app/page.js:258:17)
+    at async handleAuthSubmit (app/page.js:362:20)
+  256 |       if (!response.ok) {
+  257 |         const message = getApiErrorMessage(data, response.status);
+> 258 |         console.error("API request failed", {
+      |                 ^
+  259 |           path,
+  260 |           status: response.status,
+  261 |           message, (app/page.js:258:17)
+⨯ TypeError: fetch failed
+    at async proxyToBackend (app\api\[...path]\route.js:35:20)
+  33 |   headers.set("ngrok-skip-browser-warning", "true");
+  34 |
+> 35 |   const response = await fetch(targetUrl, {
+     |                    ^
+  36 |     method: request.method,
+  37 |     headers,
+  38 |     body: ["GET", "HEAD"].includes(request.method) {
+  [cause]: Error [ConnectTimeoutError]: Connect Timeout Error (attempted address: ssh.gsmsv.site:26121, timeout: 10000ms)
+      at ignore-listed frames {
+    code: 'UND_ERR_CONNECT_TIMEOUT'
+  }
 }
+^Cnpm error A complete log of this run can be found in: C:\Users\user\AppData\Local\npm-cache\_logs\2026-05-06T10_45_15_486Z-debug-0.log

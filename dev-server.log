@@ -2,4 +2,39 @@
 > dev-alram@0.1.0 dev
 > next dev -p 3000
 
-[?25h
+▲ Next.js 16.2.4 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://172.16.0.2:3000
+- Environments: .env.local
+✓ Ready in 471ms
+
+ GET / 200 in 308ms (next.js: 157ms, application-code: 151ms)
+ GET /firebase-messaging-sw.js 200 in 65ms (next.js: 52ms, application-code: 14ms)
+ POST /api/auth/login 401 in 1583ms (next.js: 670ms, application-code: 913ms)
+ GET / 200 in 45ms (next.js: 5ms, application-code: 40ms)
+ GET /firebase-messaging-sw.js 200 in 7ms (next.js: 3ms, application-code: 4ms)
+ POST /api/auth/login 401 in 1058ms (next.js: 10ms, application-code: 1048ms)
+  Reload env: .env.local
+  Reload env: .env.local
+ GET / 200 in 135ms (next.js: 66ms, application-code: 69ms)
+ GET /firebase-messaging-sw.js 200 in 31ms (next.js: 28ms, application-code: 4ms)
+ POST /api/auth/login 403 in 824ms (next.js: 29ms, application-code: 795ms)
+✓ Compiled in 196ms
+ GET / 200 in 88ms (next.js: 50ms, application-code: 39ms)
+ POST /api/auth/login 403 in 184ms (next.js: 39ms, application-code: 144ms)
+ GET / 200 in 80ms (next.js: 5ms, application-code: 75ms)
+ GET /firebase-messaging-sw.js 200 in 13ms (next.js: 9ms, application-code: 4ms)
+✓ Compiled in 52ms
+ GET / 200 in 141ms (next.js: 99ms, application-code: 42ms)
+ POST /api/auth/login 403 in 188ms (next.js: 27ms, application-code: 162ms)
+ GET / 200 in 61ms (next.js: 3ms, application-code: 59ms)
+ GET /firebase-messaging-sw.js 200 in 13ms (next.js: 10ms, application-code: 3ms)
+ POST /api/auth/login 403 in 125ms (next.js: 9ms, application-code: 116ms)
+ POST /api/auth/login 403 in 77ms (next.js: 10ms, application-code: 67ms)
+ GET / 200 in 37ms (next.js: 3ms, application-code: 34ms)
+ GET /firebase-messaging-sw.js 200 in 6ms (next.js: 3ms, application-code: 4ms)
+ POST /api/auth/login 403 in 119ms (next.js: 10ms, application-code: 108ms)
+ POST /api/auth/login 403 in 56ms (next.js: 8ms, application-code: 49ms)
+✓ Compiled in 42ms
+ GET / 200 in 138ms (next.js: 102ms, application-code: 37ms)
+ POST /api/auth/login 200 in 10.5s (next.js: 20ms, application-code: 10.5s)
